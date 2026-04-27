@@ -1,0 +1,151 @@
+---
+import '../styles/global.css';
+import TaskATab from '../components/TaskATab.jsx';
+import TaskBTab from '../components/TaskBTab.jsx';
+import TaskDTab from '../components/TaskDTab.jsx';
+---
+
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vision Studio | Professional OpenCV App</title>
+  <meta name="description" content="A premium web interface for advanced computer vision algorithms.">
+</head>
+<body class="bg-[#0a0a0f] text-gray-200 antialiased min-h-screen relative overflow-x-hidden">
+  
+  <!-- Premium Mesh Gradient Background -->
+  <div class="fixed inset-0 z-[-1] pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-900/20 blur-[120px] mix-blend-screen animate-float"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-900/20 blur-[120px] mix-blend-screen animate-float" style="animation-delay: 2s;"></div>
+    <div class="absolute top-[40%] left-[60%] w-[30%] h-[30%] rounded-full bg-emerald-900/10 blur-[100px] mix-blend-screen animate-pulse-slow"></div>
+  </div>
+
+  <div class="min-h-screen flex flex-col relative z-10">
+    <!-- Glassmorphism Header -->
+    <header class="bg-[#0a0a0f]/60 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50 transition-all duration-300">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4 group cursor-pointer">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] group-hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] transition-all duration-500 transform group-hover:rotate-12">
+            hi
+          </div>
+          <h1 class="text-3xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">
+            Hongseo Jang
+          </h1>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+          <a href="#" class="hover:text-white transition-colors">Documentation</a>
+          <a href="#" class="hover:text-white transition-colors">API</a>
+          <button class="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/5 transition-all">
+            Settings
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full animate-slide-up">
+      
+      <!-- Hero Section -->
+      <div class="text-center mb-16 relative">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold mb-6 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+          <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+          국립순천대학교 컴퓨터비전 
+        </div>
+        <h2 class="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
+          Next-Gen <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Computer Vision</span>
+        </h2>
+        <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
+          Experience state-of-the-art image processing, object detection, and motion tracking directly in your browser. Powered by FastAPI and OpenCV.
+        </p>
+      </div>
+
+      <!-- Modern Tabs -->
+      <div class="bg-[#13131a]/80 backdrop-blur-md p-1.5 rounded-2xl shadow-2xl border border-white/5 mb-10 max-w-3xl mx-auto flex flex-wrap relative">
+        <button id="tab-btn-a" class="tab-btn flex-1 relative z-10 px-6 py-4 font-bold transition-all duration-300 text-sm md:text-base text-white">
+          <span class="flex items-center justify-center gap-2">✨ Enhancement</span>
+        </button>
+        <button id="tab-btn-b" class="tab-btn flex-1 relative z-10 px-6 py-4 font-bold transition-all duration-300 text-sm md:text-base text-gray-400 hover:text-gray-200">
+          <span class="flex items-center justify-center gap-2">🪙 Detection</span>
+        </button>
+        <button id="tab-btn-d" class="tab-btn flex-1 relative z-10 px-6 py-4 font-bold transition-all duration-300 text-sm md:text-base text-gray-400 hover:text-gray-200">
+          <span class="flex items-center justify-center gap-2">🚗 Tracking</span>
+        </button>
+        <!-- Active Tab Indicator -->
+        <div id="tab-indicator" class="absolute top-1.5 left-1.5 h-[calc(100%-12px)] bg-gradient-to-r from-blue-600/80 to-purple-600/80 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all duration-500 ease-out z-0 border border-white/10" style="width: calc(33.333% - 4px); transform: translateX(0);"></div>
+      </div>
+
+      <!-- Tab Contents -->
+      <div class="relative max-w-5xl mx-auto w-full">
+        <div id="tab-content-a" class="tab-content block animate-fade-in">
+          <TaskATab client:load />
+        </div>
+        <div id="tab-content-b" class="tab-content hidden">
+          <TaskBTab client:load />
+        </div>
+        <div id="tab-content-d" class="tab-content hidden">
+          <TaskDTab client:load />
+        </div>
+      </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="border-t border-white/5 mt-auto bg-[#0a0a0f]/80 backdrop-blur-lg py-8">
+      <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-gray-500 text-sm font-medium">© 2026 Vision Studio. Powered by AI.</p>
+        <div class="flex items-center gap-4">
+          <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse"></div>
+          <span class="text-sm text-gray-400 font-medium">System Online</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <style>
+    @reference "../styles/global.css";
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = ['a', 'b', 'd'];
+      const indicator = document.getElementById('tab-indicator');
+      
+      tabs.forEach((tab, index) => {
+        const btn = document.getElementById(`tab-btn-${tab}`);
+        btn?.addEventListener('click', () => {
+          // Move Indicator
+          if (indicator) {
+            indicator.style.transform = `translateX(calc(${index * 100}% + ${index * 6}px))`;
+          }
+
+          tabs.forEach(t => {
+            const tBtn = document.getElementById(`tab-btn-${t}`);
+            const tContent = document.getElementById(`tab-content-${t}`);
+            
+            // Reset button text color
+            tBtn?.classList.remove('text-white');
+            tBtn?.classList.add('text-gray-400', 'hover:text-gray-200');
+            
+            // Hide content
+            tContent?.classList.remove('block', 'animate-fade-in');
+            tContent?.classList.add('hidden');
+          });
+          
+          // Active button styling
+          btn.classList.remove('text-gray-400', 'hover:text-gray-200');
+          btn.classList.add('text-white');
+          
+          // Show active content
+          const activeContent = document.getElementById(`tab-content-${tab}`);
+          activeContent?.classList.remove('hidden');
+          // small delay for smooth feel
+          setTimeout(() => {
+            activeContent?.classList.add('block', 'animate-fade-in');
+          }, 50);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
