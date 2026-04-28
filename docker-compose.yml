@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: "moomin03/4thbackend:v1"
+    image: "moomin03/4thbackend:latest"
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: "moomin03/4thfrontend:v1"
+    image: "moomin03/4thfrontend:latest"
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -24,7 +24,7 @@ services:
         # 프론트엔드 빌드 시 로컬 백엔드 API의 주소를 바라보도록 설정합니다.
         - PUBLIC_API_URL=http://localhost:8000
     ports:
-      - "8080:80"
+      - "1234:80"
     depends_on:
       - backend
     restart: unless-stopped
