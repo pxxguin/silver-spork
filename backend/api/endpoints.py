@@ -90,6 +90,12 @@ def get_dataset_thumbnail(task: str, file_path: str):
         raise HTTPException(status_code=404, detail="File not found")
         
     if task in ['A', 'B', 'C']:
+        if full_path.lower().endswith('.pgm'):
+            img = cv2.imread(full_path)
+            if img is None:
+                raise HTTPException(status_code=500, detail="Could not read image file")
+            _, encoded_img = cv2.imencode('.jpg', img)
+            return Response(content=encoded_img.tobytes(), media_type="image/jpeg")
         return FileResponse(full_path)
     elif task == 'D':
         cap = cv2.VideoCapture(full_path)
