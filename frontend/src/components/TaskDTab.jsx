@@ -6,7 +6,7 @@ export default function TaskDTab() {
   // Canvas and Image references
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
-  
+
   // File upload state
   const [file, setFile] = useState(null);
   const [internalFiles, setInternalFiles] = useState([]);
@@ -21,16 +21,16 @@ export default function TaskDTab() {
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 });
   const [hasBox, setHasBox] = useState(false);
-  
+
   // Advanced Tracker Parameters
   const [learningRate, setLearningRate] = useState(0.02);
   const [numScales, setNumScales] = useState(33);
   const [padding, setPadding] = useState(3.0);
-  
+
   const [frameLoaded, setFrameLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [videoUrl, setVideoUrl] = useState(null);
   const [originalVideoUrl, setOriginalVideoUrl] = useState(null);
 
@@ -48,23 +48,23 @@ export default function TaskDTab() {
   const loadFirstFrameFromBackend = async (uploadedFile) => {
     setFrameLoaded(false);
     setError('');
-    
+
     try {
       const formData = new FormData();
       formData.append('file', uploadedFile);
-      
+
       const response = await fetch(API_URL + '/api/get-first-frame', {
         method: 'POST',
         body: formData,
       });
-      
+
       if (!response.ok) {
         throw new Error('비디오에서 프레임을 읽을 수 없습니다.');
       }
-      
+
       const blob = await response.blob();
       const imgUrl = URL.createObjectURL(blob);
-      
+
       const img = new Image();
       img.src = imgUrl;
       img.onload = () => {
@@ -80,7 +80,7 @@ export default function TaskDTab() {
   const loadInternalFrame = (filename) => {
     setFrameLoaded(false);
     setError('');
-    
+
     const img = new Image();
     img.crossOrigin = 'Anonymous';
     img.src = `${API_URL}/api/datasets/thumbnail/D/${filename}`;
@@ -130,19 +130,19 @@ export default function TaskDTab() {
     const canvas = canvasRef.current;
     if (!canvas || !imgRef.current) return;
     const ctx = canvas.getContext('2d');
-    
+
     canvas.width = imgRef.current.width;
     canvas.height = imgRef.current.height;
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imgRef.current, 0, 0);
-    
+
     if (box) {
       ctx.strokeStyle = '#a855f7';
       ctx.lineWidth = 4;
       ctx.setLineDash([8, 6]);
       ctx.strokeRect(box.x, box.y, box.width, box.height);
-      
+
       ctx.fillStyle = 'rgba(168, 85, 247, 0.2)';
       ctx.fillRect(box.x, box.y, box.width, box.height);
     }
@@ -172,28 +172,28 @@ export default function TaskDTab() {
     if (!isDrawing) return;
     const pos = getCanvasCoords(e);
     setCurrentPos(pos);
-    
+
     const x = Math.min(startPos.x, pos.x);
     const y = Math.min(startPos.y, pos.y);
     const width = Math.abs(pos.x - startPos.x);
     const height = Math.abs(pos.y - startPos.y);
-    
+
     redrawCanvas({ x, y, width, height });
   };
 
   const handleMouseUpOrLeave = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
-    
+
     const x = Math.round(Math.min(startPos.x, currentPos.x));
     const y = Math.round(Math.min(startPos.y, currentPos.y));
     const width = Math.round(Math.abs(currentPos.x - startPos.x));
     const height = Math.round(Math.abs(currentPos.y - startPos.y));
-    
+
     if (width > 10 && height > 10) {
       setRoi({ x, y, width, height });
       setHasBox(true);
-      
+
       const ctx = canvasRef.current.getContext('2d');
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       ctx.drawImage(imgRef.current, 0, 0);
@@ -220,12 +220,12 @@ export default function TaskDTab() {
     setError('');
     setVideoUrl(null);
     setOriginalVideoUrl(null);
-    
+
     try {
       const formData = new FormData();
       if (file) formData.append('file', file);
       if (selectedInternalFile) formData.append('internal_file', selectedInternalFile);
-      
+
       const trackingPayload = {
         roi: roi,
         params: {
@@ -249,11 +249,11 @@ export default function TaskDTab() {
       const data = await response.json();
       setVideoUrl(`${API_URL}${data.video_url}`);
       setOriginalVideoUrl(`${API_URL}${data.original_video_url}`);
-      
+
       setTimeout(() => {
         window.scrollBy({ top: 800, behavior: 'smooth' });
       }, 200);
-      
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -263,22 +263,22 @@ export default function TaskDTab() {
 
   return (
     <div className="p-8 bg-[#13131a]/60 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/10 transition-all flex flex-col gap-6 relative">
-      
+
       <div className="mb-2 z-10 relative">
         <h2 className="text-3xl font-black text-white tracking-tight mb-2 flex items-center gap-3">
           <span className="p-2 bg-purple-500/20 rounded-lg text-purple-400">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
           </span>
-          Object Tracking & ROI Selection
+          영상 움직임 검출 및 추적
         </h2>
-        <p className="text-gray-400 font-light">Upload a video or select a default one, then draw a bounding box over the object you want to track on the first frame.</p>
+        <p className="text-gray-400 font-light">영상을 업로드하거나 기본 영상을 선택한 후, 첫 프레임에서 추적하고자 하는 객체 주위에 영역을 지정하세요.</p>
       </div>
 
       {/* Upload Zone */}
       <div className="bg-white/5 p-6 rounded-2xl border border-white/10 z-10 relative">
         <label className="block text-sm font-semibold text-gray-300 mb-4">Input Video Source</label>
-        
-        <div 
+
+        <div
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
           onDrop={handleDrop}
@@ -298,7 +298,7 @@ export default function TaskDTab() {
             </div>
           </div>
         </div>
-        
+
         <div className="mt-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-semibold text-gray-400">Or use Internal Datasets</span>
@@ -306,7 +306,7 @@ export default function TaskDTab() {
               {showInternalGrid ? "Collapse Grid" : "Browse Datasets"}
             </button>
           </div>
-          
+
           {selectedInternalFile && !showInternalGrid && (
             <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center gap-3 w-fit">
               <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
@@ -344,12 +344,12 @@ export default function TaskDTab() {
           </div>
         ) : !frameLoaded ? (
           <div className="flex flex-col items-center gap-3 w-full max-w-4xl aspect-[16/9] justify-center">
-             <svg className="animate-spin h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-             <span className="text-purple-400 font-medium">Extracting First Frame...</span>
+            <svg className="animate-spin h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span className="text-purple-400 font-medium">Extracting First Frame...</span>
           </div>
         ) : (
           <>
-            <canvas 
+            <canvas
               ref={canvasRef}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
@@ -360,7 +360,7 @@ export default function TaskDTab() {
             {/* Helper Badge */}
             {!hasBox && !isDrawing && (
               <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/70 backdrop-blur-md rounded-full border border-purple-500/30 text-purple-200 text-sm font-medium pointer-events-none animate-bounce">
-                마우스를 드래그하여 추적할 객체를 지정하세요
+                영상을 업로드하거나, 기본 영상 선택 후 여기를 한번 클릭해주세요!
               </div>
             )}
           </>
@@ -370,7 +370,7 @@ export default function TaskDTab() {
       {/* 상태 표시 패널 및 컨트롤 바 */}
       {frameLoaded && (
         <div className="flex flex-col gap-6 z-10 relative animate-slide-up">
-          
+
           {/* Tracker Settings Panel */}
           <div className="bg-white/5 p-6 rounded-2xl border border-white/10 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col gap-2">
@@ -380,7 +380,7 @@ export default function TaskDTab() {
               </label>
               <input type="range" min="0.01" max="0.10" step="0.01" value={learningRate} onChange={(e) => setLearningRate(Number(e.target.value))} className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
             </div>
-            
+
             <div className="flex flex-col gap-2">
               <label className="text-sm font-bold text-gray-200 flex justify-between">
                 <span>Number of Scales</span>
@@ -388,7 +388,7 @@ export default function TaskDTab() {
               </label>
               <input type="range" min="10" max="50" step="1" value={numScales} onChange={(e) => setNumScales(Number(e.target.value))} className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
             </div>
-            
+
             <div className="flex flex-col gap-2">
               <label className="text-sm font-bold text-gray-200 flex justify-between">
                 <span>Padding</span>
@@ -407,13 +407,13 @@ export default function TaskDTab() {
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <button 
+              <button
                 onClick={handleClear}
                 className="px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold transition-all border border-gray-600 shadow-sm whitespace-nowrap"
               >
                 초기화
               </button>
-              <button 
+              <button
                 onClick={handleStartTracking}
                 disabled={!hasBox || loading}
                 className="flex-1 sm:flex-none px-8 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-bold transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
@@ -424,7 +424,7 @@ export default function TaskDTab() {
           </div>
         </div>
       )}
-      
+
       {/* 5. Tracking Results Viewer */}
       {(videoUrl || originalVideoUrl) && (
         <div className="mt-8 pt-8 border-t border-white/10 animate-slide-up">
@@ -436,7 +436,7 @@ export default function TaskDTab() {
               </a>
             )}
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="flex flex-col group">
               <div className="flex items-center justify-between mb-3 px-1">
@@ -450,7 +450,7 @@ export default function TaskDTab() {
                 )}
               </div>
             </div>
-            
+
             <div className="flex flex-col group">
               <div className="flex items-center justify-between mb-3 px-1">
                 <span className="text-sm font-bold text-purple-400 uppercase tracking-wider">Tracked Object</span>
@@ -466,7 +466,7 @@ export default function TaskDTab() {
           </div>
         </div>
       )}
-      
+
     </div>
   );
 }

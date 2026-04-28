@@ -25,14 +25,14 @@ export default function TaskCTab() {
   const [loweRatio, setLoweRatio] = useState(0.7);
   const [nOctaveLayers, setNOctaveLayers] = useState(3);
   const [contrastThreshold, setContrastThreshold] = useState(0.04);
-  
+
   // Results
   const [resultImg, setResultImg] = useState(null);
   const [originalTarget, setOriginalTarget] = useState(null);
   const [originalQuery, setOriginalQuery] = useState(null);
   const [matchData, setMatchData] = useState(null);
   const [matchCount, setMatchCount] = useState(null);
-  
+
   // Status
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -125,7 +125,7 @@ export default function TaskCTab() {
 
     if (queryFile) formData.append('query_file', queryFile);
     else if (selectedQueryInternal) formData.append('query_internal', selectedQueryInternal);
-    
+
     formData.append('algo', algo);
     formData.append('nfeatures', nfeatures);
     formData.append('lowe_ratio', loweRatio);
@@ -170,8 +170,8 @@ export default function TaskCTab() {
     return (
       <div className="bg-white/5 p-5 rounded-2xl border border-white/10 flex-1">
         <label className="block text-sm font-semibold text-gray-300 mb-3">{title}</label>
-        
-        <div 
+
+        <div
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
           onDrop={(e) => handleDrop(e, type)}
@@ -180,14 +180,14 @@ export default function TaskCTab() {
             ${isDragging ? 'border-indigo-500 bg-indigo-500/10' : 'border-gray-600 hover:border-indigo-400 hover:bg-white/5'}
             ${file ? 'border-indigo-500/50 bg-indigo-500/5' : ''}`}
         >
-          <input 
+          <input
             ref={inputRef}
-            type="file" 
-            accept="image/*" 
+            type="file"
+            accept="image/*"
             onChange={(e) => handleFileChange(e, type)}
             className="hidden"
           />
-          
+
           <div className="flex flex-col items-center justify-center gap-2 pointer-events-none">
             <div className={`p-3 rounded-full transition-colors ${file ? 'bg-indigo-500/20 text-indigo-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700'}`}>
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -201,19 +201,19 @@ export default function TaskCTab() {
             </div>
           </div>
         </div>
-        
+
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-gray-400">or Internal Dataset</span>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setShowInternalGrid(!showInternalGrid)}
               className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-md text-xs font-medium text-white transition-all"
             >
               {showInternalGrid ? "Close" : "Browse"}
             </button>
           </div>
-          
+
           {selectedInternal && !showInternalGrid && (
             <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
@@ -224,8 +224,8 @@ export default function TaskCTab() {
           {showInternalGrid && (
             <div className="max-h-[200px] overflow-y-auto bg-black/40 p-2 rounded-xl border border-white/5 grid grid-cols-3 sm:grid-cols-4 gap-2 custom-scrollbar">
               {internalFiles.length > 0 ? internalFiles.map((f, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   onClick={() => handleInternalFileSelect(f, type)}
                   className={`cursor-pointer overflow-hidden rounded-lg aspect-square bg-gray-900 flex items-center justify-center border transition-all group ${selectedInternal === f ? 'border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'border-transparent hover:border-indigo-400/50'}`}
                 >
@@ -255,9 +255,9 @@ export default function TaskCTab() {
           <span className="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
           </span>
-          Feature Matching Engine
+          지역 특징 비교 및 매칭
         </h2>
-        <p className="text-gray-400 font-light">Find corresponding features between two images using SIFT or ORB algorithms.</p>
+        <p className="text-gray-400 font-light">특징점 추출 및 매칭 알고리즘을 사용하여 두 이미지 간의 대응점을 찾습니다.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -274,7 +274,7 @@ export default function TaskCTab() {
             Advanced Controls
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
+
             {/* Algorithm Selection */}
             <div className="col-span-1 md:col-span-2 lg:col-span-3">
               <label className="block text-sm font-bold text-gray-200 mb-3">Algorithm</label>
@@ -296,8 +296,8 @@ export default function TaskCTab() {
                 <span>Max Features</span>
                 <span className="text-indigo-400 font-mono">{nfeatures === 0 ? 'Auto' : nfeatures}</span>
               </label>
-              <input 
-                type="number" min="0" max="5000" 
+              <input
+                type="number" min="0" max="5000"
                 value={nfeatures} onChange={(e) => setNfeatures(Number(e.target.value))}
                 className="w-full bg-black/40 border border-white/10 rounded-lg text-white p-2 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
               />
@@ -310,8 +310,8 @@ export default function TaskCTab() {
                 <span>Lowe's Ratio</span>
                 <span className="text-indigo-400 font-mono">{loweRatio}</span>
               </label>
-              <input 
-                type="range" min="0.0" max="0.9" step="0.05" 
+              <input
+                type="range" min="0.0" max="0.9" step="0.05"
                 value={loweRatio} onChange={(e) => setLoweRatio(Number(e.target.value))}
                 className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer mt-3"
               />
@@ -323,8 +323,8 @@ export default function TaskCTab() {
                 <span>Octave Layers</span>
                 <span className="text-indigo-400 font-mono">{nOctaveLayers}</span>
               </label>
-              <input 
-                type="number" min="3" max="6" 
+              <input
+                type="number" min="3" max="6"
                 value={nOctaveLayers} onChange={(e) => setNOctaveLayers(Number(e.target.value))}
                 className="w-full bg-black/40 border border-white/10 rounded-lg text-white p-2 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
               />
@@ -336,7 +336,7 @@ export default function TaskCTab() {
                 <span>Contrast Threshold</span>
                 <span className="text-indigo-400 font-mono">{contrastThreshold}</span>
               </label>
-              <input 
+              <input
                 type="number" min="0.01" max="0.1" step="0.01"
                 value={contrastThreshold} onChange={(e) => setContrastThreshold(Number(e.target.value))}
                 className="w-full bg-black/40 border border-white/10 rounded-lg text-white p-2 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
@@ -353,8 +353,8 @@ export default function TaskCTab() {
           </div>
         )}
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={loading || (!targetFile && !selectedTargetInternal) || (!queryFile && !selectedQueryInternal)}
           className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1"
         >
@@ -375,17 +375,17 @@ export default function TaskCTab() {
         <div className="mt-12 pt-10 border-t border-white/10 animate-slide-up">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <h3 className="text-2xl font-black text-white tracking-tight">Matching Results</h3>
-            
+
             <div className="flex items-center gap-4">
               <div className={`px-4 py-2 rounded-xl text-sm font-bold border backdrop-blur-md ${matchCount > 0 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'bg-red-500/20 text-red-300 border-red-500/30'}`}>
                 Good Matches: {matchCount}
               </div>
             </div>
           </div>
-          
+
           <div className="w-full">
             {originalTarget && originalQuery && matchData ? (
-              <MatchListViewer 
+              <MatchListViewer
                 resultImage={resultImg}
                 originalTarget={originalTarget}
                 originalQuery={originalQuery}

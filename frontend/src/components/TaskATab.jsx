@@ -8,17 +8,17 @@ export default function TaskATab() {
   const [selectedInternalFile, setSelectedInternalFile] = useState('');
   const [showInternalGrid, setShowInternalGrid] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  
+
   const [gamma, setGamma] = useState(1.0);
   const [clipLimit, setClipLimit] = useState(2.0);
   const [gridSize, setGridSize] = useState(8);
-  
+
   const [resultImg, setResultImg] = useState(null);
   const [originalImg, setOriginalImg] = useState(null);
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function TaskATab() {
     } else if (selectedInternalFile) {
       formData.append('internal_file', selectedInternalFile);
     }
-    
+
     formData.append('gamma', gamma);
     formData.append('clip_limit', clipLimit);
     formData.append('grid_size', gridSize);
@@ -113,17 +113,17 @@ export default function TaskATab() {
           <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
           </span>
-          Low-Light Enhancement
+          이미지 전처리 및 향상
         </h2>
-        <p className="text-gray-400 font-light">Advanced CLAHE & Gamma Correction for poorly illuminated images.</p>
+        <p className="text-gray-400 font-light">저조도 이미지의 대비를 개선하여 성능을 향상시킵니다.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Upload Zone */}
         <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
           <label className="block text-sm font-semibold text-gray-300 mb-4">Input Source</label>
-          
-          <div 
+
+          <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -132,14 +132,14 @@ export default function TaskATab() {
               ${isDragging ? 'border-blue-500 bg-blue-500/10' : 'border-gray-600 hover:border-blue-400 hover:bg-white/5'}
               ${file ? 'border-blue-500/50 bg-blue-500/5' : ''}`}
           >
-            <input 
+            <input
               ref={fileInputRef}
-              type="file" 
-              accept="image/*" 
+              type="file"
+              accept="image/*"
               onChange={handleFileChange}
               className="hidden"
             />
-            
+
             <div className="flex flex-col items-center justify-center gap-3 pointer-events-none">
               <div className={`p-3 rounded-full transition-colors ${file ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700'}`}>
                 {file ? (
@@ -158,7 +158,7 @@ export default function TaskATab() {
               </div>
             </div>
           </div>
-          
+
           <div className="relative flex items-center py-6">
             <div className="flex-grow border-t border-white/10"></div>
             <span className="flex-shrink-0 mx-4 text-gray-500 text-xs font-bold tracking-widest uppercase">Or</span>
@@ -168,15 +168,15 @@ export default function TaskATab() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-semibold text-gray-300">Internal Kaggle Datasets</span>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setShowInternalGrid(!showInternalGrid)}
                 className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium text-white transition-all shadow-sm"
               >
                 {showInternalGrid ? "Collapse Grid" : "Browse Dataset"}
               </button>
             </div>
-            
+
             {selectedInternalFile && !showInternalGrid && (
               <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
@@ -187,8 +187,8 @@ export default function TaskATab() {
             {showInternalGrid && (
               <div className="max-h-[400px] overflow-y-auto bg-black/40 p-4 rounded-xl border border-white/5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 custom-scrollbar">
                 {internalFiles.map((f, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     onClick={() => handleInternalFileSelect(f)}
                     className={`cursor-pointer overflow-hidden rounded-xl aspect-square bg-gray-900 flex items-center justify-center border-2 transition-all group ${selectedInternalFile === f ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-[1.02]' : 'border-transparent hover:border-blue-400/50 hover:scale-[1.02]'}`}
                   >
@@ -207,8 +207,8 @@ export default function TaskATab() {
               <span>Gamma Correction</span>
               <span className="text-blue-400 font-mono">{gamma}</span>
             </label>
-            <input 
-              type="range" min="0.1" max="3.0" step="0.1" 
+            <input
+              type="range" min="0.1" max="3.0" step="0.1"
               value={gamma} onChange={(e) => setGamma(e.target.value)}
               className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
             />
@@ -220,8 +220,8 @@ export default function TaskATab() {
               <span>CLAHE Clip Limit</span>
               <span className="text-blue-400 font-mono">{clipLimit}</span>
             </label>
-            <input 
-              type="range" min="1.0" max="10.0" step="0.1" 
+            <input
+              type="range" min="1.0" max="10.0" step="0.1"
               value={clipLimit} onChange={(e) => setClipLimit(e.target.value)}
               className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
             />
@@ -233,8 +233,8 @@ export default function TaskATab() {
               <span>Grid Size</span>
               <span className="text-blue-400 font-mono">{gridSize}x{gridSize}</span>
             </label>
-            <input 
-              type="range" min="2" max="16" step="2" 
+            <input
+              type="range" min="2" max="16" step="2"
               value={gridSize} onChange={(e) => setGridSize(e.target.value)}
               className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
             />
@@ -249,8 +249,8 @@ export default function TaskATab() {
           </div>
         )}
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={loading}
           className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1"
         >
@@ -282,13 +282,13 @@ export default function TaskATab() {
                 )}
               </div>
             </div>
-            
+
             <div className="flex flex-col group">
               <div className="flex items-center justify-between mb-3 px-1">
                 <span className="text-sm font-bold text-blue-400 uppercase tracking-wider">Enhanced Result</span>
                 {resultImg && (
-                  <a 
-                    href={resultImg} 
+                  <a
+                    href={resultImg}
                     download="enhanced_result.jpg"
                     className="text-xs bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full font-semibold hover:bg-blue-500/30 transition-colors"
                   >

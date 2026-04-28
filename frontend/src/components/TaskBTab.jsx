@@ -15,12 +15,12 @@ export default function TaskBTab() {
   const [param2, setParam2] = useState(30);
   const [minRadius, setMinRadius] = useState(10);
   const [maxRadius, setMaxRadius] = useState(50);
-  
+
   const [resultImg, setResultImg] = useState(null);
   const [originalImg, setOriginalImg] = useState(null);
   const [count, setCount] = useState(null);
   const [message, setMessage] = useState('');
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -87,7 +87,7 @@ export default function TaskBTab() {
     } else if (selectedInternalFile) {
       formData.append('internal_file', selectedInternalFile);
     }
-    
+
     formData.append('dp', dp);
     formData.append('min_dist', minDist);
     formData.append('param1', param1);
@@ -125,17 +125,17 @@ export default function TaskBTab() {
           <span className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </span>
-          Coin Detection Engine
+          객체 검출 및 개수 세기
         </h2>
-        <p className="text-gray-400 font-light">Powered by Hough Circle Transform to accurately detect and count circular objects.</p>
+        <p className="text-gray-400 font-light">허프 원 변환 알고리즘을 사용하여 원형 객체를 검출하고 개수를 셉니다.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Upload Zone */}
         <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
           <label className="block text-sm font-semibold text-gray-300 mb-4">Input Source</label>
-          
-          <div 
+
+          <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -144,14 +144,14 @@ export default function TaskBTab() {
               ${isDragging ? 'border-emerald-500 bg-emerald-500/10' : 'border-gray-600 hover:border-emerald-400 hover:bg-white/5'}
               ${file ? 'border-emerald-500/50 bg-emerald-500/5' : ''}`}
           >
-            <input 
+            <input
               ref={fileInputRef}
-              type="file" 
-              accept="image/*" 
+              type="file"
+              accept="image/*"
               onChange={handleFileChange}
               className="hidden"
             />
-            
+
             <div className="flex flex-col items-center justify-center gap-3 pointer-events-none">
               <div className={`p-3 rounded-full transition-colors ${file ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700'}`}>
                 {file ? (
@@ -170,7 +170,7 @@ export default function TaskBTab() {
               </div>
             </div>
           </div>
-          
+
           <div className="relative flex items-center py-6">
             <div className="flex-grow border-t border-white/10"></div>
             <span className="flex-shrink-0 mx-4 text-gray-500 text-xs font-bold tracking-widest uppercase">Or</span>
@@ -180,15 +180,15 @@ export default function TaskBTab() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-semibold text-gray-300">Internal Kaggle Datasets</span>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setShowInternalGrid(!showInternalGrid)}
                 className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium text-white transition-all shadow-sm"
               >
                 {showInternalGrid ? "Collapse Grid" : "Browse Dataset"}
               </button>
             </div>
-            
+
             {selectedInternalFile && !showInternalGrid && (
               <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -199,8 +199,8 @@ export default function TaskBTab() {
             {showInternalGrid && (
               <div className="max-h-[400px] overflow-y-auto bg-black/40 p-4 rounded-xl border border-white/5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 custom-scrollbar">
                 {internalFiles.map((f, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     onClick={() => handleInternalFileSelect(f)}
                     className={`cursor-pointer overflow-hidden rounded-xl aspect-square bg-gray-900 flex items-center justify-center border-2 transition-all group ${selectedInternalFile === f ? 'border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-[1.02]' : 'border-transparent hover:border-emerald-400/50 hover:scale-[1.02]'}`}
                   >
@@ -219,8 +219,8 @@ export default function TaskBTab() {
               <span>DP Ratio</span>
               <span className="text-emerald-400 font-mono">{dp}</span>
             </label>
-            <input 
-              type="range" min="1" max="2" step="0.1" 
+            <input
+              type="range" min="1" max="2" step="0.1"
               value={dp} onChange={(e) => setDp(e.target.value)}
               className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
             />
@@ -231,8 +231,8 @@ export default function TaskBTab() {
               <span>Min Distance</span>
               <span className="text-emerald-400 font-mono">{minDist}</span>
             </label>
-            <input 
-              type="number" min="1" 
+            <input
+              type="number" min="1"
               value={minDist} onChange={(e) => setMinDist(e.target.value)}
               className="w-full bg-black/40 border border-white/10 rounded-lg text-white p-2 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
             />
@@ -243,8 +243,8 @@ export default function TaskBTab() {
               <span>Canny Param (Param1)</span>
               <span className="text-emerald-400 font-mono">{param1}</span>
             </label>
-            <input 
-              type="range" min="50" max="300" step="10" 
+            <input
+              type="range" min="50" max="300" step="10"
               value={param1} onChange={(e) => setParam1(e.target.value)}
               className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
             />
@@ -255,8 +255,8 @@ export default function TaskBTab() {
               <span>Accumulator (Param2)</span>
               <span className="text-emerald-400 font-mono">{param2}</span>
             </label>
-            <input 
-              type="range" min="10" max="100" step="1" 
+            <input
+              type="range" min="10" max="100" step="1"
               value={param2} onChange={(e) => setParam2(e.target.value)}
               className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer"
             />
@@ -267,8 +267,8 @@ export default function TaskBTab() {
               <span>Min Radius</span>
               <span className="text-emerald-400 font-mono">{minRadius}</span>
             </label>
-            <input 
-              type="number" min="0" 
+            <input
+              type="number" min="0"
               value={minRadius} onChange={(e) => setMinRadius(e.target.value)}
               className="w-full bg-black/40 border border-white/10 rounded-lg text-white p-2 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
             />
@@ -279,8 +279,8 @@ export default function TaskBTab() {
               <span>Max Radius</span>
               <span className="text-emerald-400 font-mono">{maxRadius}</span>
             </label>
-            <input 
-              type="number" min="0" 
+            <input
+              type="number" min="0"
               value={maxRadius} onChange={(e) => setMaxRadius(e.target.value)}
               className="w-full bg-black/40 border border-white/10 rounded-lg text-white p-2 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
             />
@@ -294,8 +294,8 @@ export default function TaskBTab() {
           </div>
         )}
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={loading}
           className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1"
         >
@@ -315,7 +315,7 @@ export default function TaskBTab() {
         <div className="mt-12 pt-10 border-t border-white/10 animate-slide-up">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <h3 className="text-2xl font-black text-white tracking-tight">Detection Results</h3>
-            
+
             <div className="flex items-center gap-4">
               <div className={`px-4 py-2 rounded-xl text-sm font-bold border backdrop-blur-md ${count > 0 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-orange-500/20 text-orange-300 border-orange-500/30'}`}>
                 Detected: {count} Objects
@@ -325,7 +325,7 @@ export default function TaskBTab() {
               </div>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="flex flex-col group">
               <div className="flex items-center justify-between mb-3 px-1">
@@ -339,13 +339,13 @@ export default function TaskBTab() {
                 )}
               </div>
             </div>
-            
+
             <div className="flex flex-col group">
               <div className="flex items-center justify-between mb-3 px-1">
                 <span className="text-sm font-bold text-emerald-400 uppercase tracking-wider">Detection Map</span>
                 {resultImg && (
-                  <a 
-                    href={resultImg} 
+                  <a
+                    href={resultImg}
                     download="detection_result.jpg"
                     className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full font-semibold hover:bg-emerald-500/30 transition-colors"
                   >
