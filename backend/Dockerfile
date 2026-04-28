@@ -3,9 +3,11 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # 시스템 의존성 설치 (OpenCV용)
+# 시스템 의존성 설치 (OpenCV용)
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # 파이썬 의존성 복사 및 설치

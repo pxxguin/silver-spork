@@ -3,6 +3,7 @@ import numpy as np
 import base64
 from typing import Tuple, List, Optional
 import os
+import subprocess
 
 class BaseVisionProcessor:
     @staticmethod
@@ -71,8 +72,9 @@ class MotionTracker(BaseVisionProcessor):
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps    = cap.get(cv2.CAP_PROP_FPS)
         
+        temp_output_path = output_path + ".temp.mp4"
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+        out = cv2.VideoWriter(temp_output_path, fourcc, fps, (width, height))
         
         backSub = cv2.createBackgroundSubtractorMOG2(
             history=history, 
@@ -100,7 +102,14 @@ class MotionTracker(BaseVisionProcessor):
             
         cap.release()
         out.release()
-        return True
+        
+        try:
+            subprocess.run(['ffmpeg', '-y', '-i', temp_output_path, '-c:v', 'libx264', '-preset', 'fast', output_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if os.path.exists(temp_output_path):
+                os.remove(temp_output_path)
+            return True
+        except subprocess.CalledProcessError:
+            return False
 
     @staticmethod
     def track_object_roi(input_path: str, output_path: str, roi: dict, params: dict = None) -> bool:
@@ -129,8 +138,9 @@ class MotionTracker(BaseVisionProcessor):
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = cap.get(cv2.CAP_PROP_FPS)
         
+        temp_output_path = output_path + ".temp.mp4"
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+        out = cv2.VideoWriter(temp_output_path, fourcc, fps, (width, height))
         
         p1 = (int(bbox[0]), int(bbox[1]))
         p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
@@ -159,30 +169,22 @@ class MotionTracker(BaseVisionProcessor):
                 
         cap.release()
         out.release()
-        return True
+        
+        try:
+            subprocess.run(['ffmpeg', '-y', '-i', temp_output_path, '-c:v', 'libx264', '-preset', 'fast', output_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if os.path.exists(temp_output_path):
+                os.remove(temp_output_path)
+            return True
+        except subprocess.CalledProcessError:
+            return False
 
     @staticmethod
     def transcode_video(input_path: str, output_path: str) -> bool:
-        cap = cv2.VideoCapture(input_path)
-        if not cap.isOpened():
+        try:
+            subprocess.run(['ffmpeg', '-y', '-i', input_path, '-c:v', 'libx264', '-preset', 'fast', output_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return True
+        except subprocess.CalledProcessError:
             return False
-            
-        width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fps    = cap.get(cv2.CAP_PROP_FPS)
-        
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-        
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            out.write(frame)
-            
-        cap.release()
-        out.release()
-        return True
 
 class FeatureMatcher(BaseVisionProcessor):
     @staticmethod
