@@ -127,7 +127,7 @@ class MotionTracker(BaseVisionProcessor):
 
 class FeatureMatcher(BaseVisionProcessor):
     @staticmethod
-    def match_features(img1: np.ndarray, img2: np.ndarray, algo: str = 'SIFT', nfeatures: int = 0, lowe_ratio: float = 0.7, nOctaveLayers: int = 3, contrastThreshold: float = 0.04) -> Tuple[np.ndarray, int]:
+    def match_features(img1: np.ndarray, img2: np.ndarray, algo: str = 'SIFT', nfeatures: int = 0, lowe_ratio: float = 0.7, nOctaveLayers: int = 3, contrastThreshold: float = 0.04) -> tuple:
         if algo == 'SIFT':
             detector = cv2.SIFT_create(nfeatures=nfeatures, nOctaveLayers=nOctaveLayers, contrastThreshold=contrastThreshold)
         else: # ORB
@@ -137,7 +137,7 @@ class FeatureMatcher(BaseVisionProcessor):
         kp2, des2 = detector.detectAndCompute(img2, None)
         
         if des1 is None or des2 is None:
-            return np.hstack((img1, img2)), 0
+            return np.hstack((img1, img2)), 0, []
             
         if algo == 'SIFT':
             FLANN_INDEX_KDTREE = 1
@@ -147,13 +147,13 @@ class FeatureMatcher(BaseVisionProcessor):
             try:
                 matches = matcher.knnMatch(des1, des2, k=2)
             except Exception:
-                return np.hstack((img1, img2)), 0
+                return np.hstack((img1, img2)), 0, []
         else:
             matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
             try:
                 matches = matcher.knnMatch(des1, des2, k=2)
             except Exception:
-                return np.hstack((img1, img2)), 0
+                return np.hstack((img1, img2)), 0, []
                 
         good_matches = []
         if len(matches) > 0 and len(matches[0]) >= 2:
@@ -163,10 +163,23 @@ class FeatureMatcher(BaseVisionProcessor):
         elif len(matches) > 0 and len(matches[0]) == 1:
             good_matches = [m[0] for m in matches]
             
+        match_data = []
+        for i, m in enumerate(good_matches):
+            pt1 = kp1[m.queryIdx].pt
+            pt2 = kp2[m.trainIdx].pt
+            match_data.append({
+                "id": i,
+                "x1": pt1[0],
+                "y1": pt1[1],
+                "x2": pt2[0],
+                "y2": pt2[1],
+                "distance": m.distance
+            })
+            
         draw_params = dict(matchColor=(0,255,0),
                            singlePointColor=(255,0,0),
                            flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
                            
         result_img = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, None, **draw_params)
         
-        return result_img, len(good_matches)
+        return result_img, len(good_matches), match_data

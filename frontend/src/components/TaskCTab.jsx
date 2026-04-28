@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import MatchListViewer from './MatchListViewer.jsx';
 
 export default function TaskCTab() {
   const [internalFiles, setInternalFiles] = useState([]);
@@ -26,6 +27,9 @@ export default function TaskCTab() {
   
   // Results
   const [resultImg, setResultImg] = useState(null);
+  const [originalTarget, setOriginalTarget] = useState(null);
+  const [originalQuery, setOriginalQuery] = useState(null);
+  const [matchData, setMatchData] = useState(null);
   const [matchCount, setMatchCount] = useState(null);
   
   // Status
@@ -99,6 +103,9 @@ export default function TaskCTab() {
     setError('');
     setMatchCount(null);
     setResultImg(null);
+    setOriginalTarget(null);
+    setOriginalQuery(null);
+    setMatchData(null);
 
     if (!targetFile && !selectedTargetInternal) {
       showToast('Target 이미지를 업로드해주세요.');
@@ -137,6 +144,9 @@ export default function TaskCTab() {
 
       const data = await response.json();
       setResultImg(data.result_image);
+      setOriginalTarget(data.original_target);
+      setOriginalQuery(data.original_query);
+      setMatchData(data.match_data);
       setMatchCount(data.match_count);
     } catch (err) {
       setError(err.message);
@@ -372,8 +382,19 @@ export default function TaskCTab() {
             </div>
           </div>
           
-          <div className="rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(99,102,241,0.15)] border border-indigo-500/30 bg-black/50 w-full flex items-center justify-center min-h-[400px] relative p-4">
-            <img src={resultImg} alt="Matching result" className="w-full h-auto object-contain max-h-[700px] rounded-lg" />
+          <div className="w-full">
+            {originalTarget && originalQuery && matchData ? (
+              <MatchListViewer 
+                resultImage={resultImg}
+                originalTarget={originalTarget}
+                originalQuery={originalQuery}
+                matchData={matchData}
+              />
+            ) : (
+              <div className="rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(99,102,241,0.15)] border border-indigo-500/30 bg-black/50 w-full flex items-center justify-center min-h-[400px] relative p-4">
+                <img src={resultImg} alt="Matching result" className="w-full h-auto object-contain max-h-[700px] rounded-lg" />
+              </div>
+            )}
           </div>
         </div>
       )}

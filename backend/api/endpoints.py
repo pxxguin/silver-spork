@@ -290,13 +290,18 @@ async def match_image_features(
     if img1 is None or img2 is None:
         raise HTTPException(status_code=400, detail="이미지를 읽을 수 없습니다.")
         
-    result_img, match_count = FeatureMatcher.match_features(
+    result_img, match_count, match_data = FeatureMatcher.match_features(
         img1, img2, algo, nfeatures, lowe_ratio, nOctaveLayers, contrastThreshold
     )
     
     base64_str = FeatureMatcher.encode_image_base64(result_img)
+    orig1_base64 = FeatureMatcher.encode_image_base64(img1)
+    orig2_base64 = FeatureMatcher.encode_image_base64(img2)
     
     return {
         "result_image": f"data:image/jpeg;base64,{base64_str}",
+        "original_target": f"data:image/jpeg;base64,{orig1_base64}",
+        "original_query": f"data:image/jpeg;base64,{orig2_base64}",
+        "match_data": match_data,
         "match_count": match_count
     }
