@@ -27,19 +27,12 @@ def validate_video(file: Optional[UploadFile]):
 def get_dataset_files(task: str):
     files_found = []
     try:
-        if task == 'A':
-            path = kagglehub.dataset_download("philmod/lol-low-light-dataset")
-            exts = ['.png', '.jpg']
-        elif task == 'B':
-            path = kagglehub.dataset_download("balabaskar/count-coins-image-dataset")
-            exts = ['.png', '.jpg']
-        elif task == 'C':
-            path = os.path.abspath("static/datasets/C")
-            os.makedirs(path, exist_ok=True)
+        path = os.path.abspath(f"static/datasets/{task}")
+        os.makedirs(path, exist_ok=True)
+        if task in ['A', 'B', 'C']:
             exts = ['.png', '.jpg', '.jpeg', '.pgm']
         elif task == 'D':
-            path = kagglehub.dataset_download("aryashah2k/highway-traffic-videos-dataset")
-            exts = ['.mp4', '.avi']
+            exts = ['.mp4', '.avi', '.mov']
         else:
             return [], ""
             
