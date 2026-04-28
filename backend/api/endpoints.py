@@ -8,7 +8,7 @@ import kagglehub
 import base64
 from typing import Optional
 from functools import lru_cache
-from core.processor import ImageEnhancer, ObjectDetector, MotionTracker
+from core.processor import ImageEnhancer, ObjectDetector, MotionTracker, FeatureMatcher
 
 router = APIRouter()
 
@@ -33,6 +33,10 @@ def get_dataset_files(task: str):
         elif task == 'B':
             path = kagglehub.dataset_download("balabaskar/count-coins-image-dataset")
             exts = ['.png', '.jpg']
+        elif task == 'C':
+            path = os.path.abspath("static/datasets/C")
+            os.makedirs(path, exist_ok=True)
+            exts = ['.png', '.jpg', '.jpeg', '.pgm']
         elif task == 'D':
             path = kagglehub.dataset_download("aryashah2k/highway-traffic-videos-dataset")
             exts = ['.mp4', '.avi']
@@ -54,14 +58,14 @@ def get_dataset_files(task: str):
 
 @router.get("/datasets/{task}")
 def list_datasets(task: str):
-    if task not in ['A', 'B', 'D']:
+    if task not in ['A', 'B', 'C', 'D']:
         raise HTTPException(status_code=400, detail="Invalid task")
     files, _ = get_dataset_files(task)
     return {"files": files}
 
 @router.get("/datasets/file/{task}/{file_path:path}")
 def get_dataset_file(task: str, file_path: str):
-    if task not in ['A', 'B', 'D']:
+    if task not in ['A', 'B', 'C', 'D']:
         raise HTTPException(status_code=400, detail="Invalid task")
     files, base_path = get_dataset_files(task)
     
@@ -75,7 +79,7 @@ def get_dataset_file(task: str, file_path: str):
 
 @router.get("/datasets/thumbnail/{task}/{file_path:path}")
 def get_dataset_thumbnail(task: str, file_path: str):
-    if task not in ['A', 'B', 'D']:
+    if task not in ['A', 'B', 'C', 'D']:
         raise HTTPException(status_code=400, detail="Invalid task")
     files, base_path = get_dataset_files(task)
     
@@ -85,7 +89,7 @@ def get_dataset_thumbnail(task: str, file_path: str):
     if not os.path.exists(full_path):
         raise HTTPException(status_code=404, detail="File not found")
         
-    if task in ['A', 'B']:
+    if task in ['A', 'B', 'C']:
         return FileResponse(full_path)
     elif task == 'D':
         cap = cv2.VideoCapture(full_path)
@@ -242,4 +246,57 @@ async def track_motion(
     return {
         "video_url": download_url,
         "original_video_url": original_url
+    }
+
+@router.post("/match")
+async def match_image_features(
+    target_file: Optional[UploadFile] = File(None),
+    query_file: Optional[UploadFile] = File(None),
+    target_internal: Optional[str] = Form(None),
+    query_internal: Optional[str] = Form(None),
+    algo: str = Form("SIFT"),
+    nfeatures: int = Form(0),
+    lowe_ratio: float = Form(0.7),
+    nOctaveLayers: int = Form(3),
+    contrastThreshold: float = Form(0.04)
+):
+    # Get target image
+    if target_file:
+        target_contents = await target_file.read()
+    elif target_internal:
+        files, base_path = get_dataset_files('C')
+        if target_internal not in files:
+            raise HTTPException(status_code=400, detail="유효하지 않은 내장 파일입니다.")
+        with open(os.path.join(base_path, target_internal), "rb") as f:
+            target_contents = f.read()
+    else:
+        raise HTTPException(status_code=400, detail="Target 이미지가 제공되지 않았습니다.")
+        
+    # Get query image
+    if query_file:
+        query_contents = await query_file.read()
+    elif query_internal:
+        files, base_path = get_dataset_files('C')
+        if query_internal not in files:
+            raise HTTPException(status_code=400, detail="유효하지 않은 내장 파일입니다.")
+        with open(os.path.join(base_path, query_internal), "rb") as f:
+            query_contents = f.read()
+    else:
+        raise HTTPException(status_code=400, detail="Query 이미지가 제공되지 않았습니다.")
+        
+    img1 = FeatureMatcher.decode_image(target_contents)
+    img2 = FeatureMatcher.decode_image(query_contents)
+    
+    if img1 is None or img2 is None:
+        raise HTTPException(status_code=400, detail="이미지를 읽을 수 없습니다.")
+        
+    result_img, match_count = FeatureMatcher.match_features(
+        img1, img2, algo, nfeatures, lowe_ratio, nOctaveLayers, contrastThreshold
+    )
+    
+    base64_str = FeatureMatcher.encode_image_base64(result_img)
+    
+    return {
+        "result_image": f"data:image/jpeg;base64,{base64_str}",
+        "match_count": match_count
     }

@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import TaskATab from '../components/TaskATab.jsx';
 import TaskBTab from '../components/TaskBTab.jsx';
+import TaskCTab from '../components/TaskCTab.jsx';
 import TaskDTab from '../components/TaskDTab.jsx';
 ---
 
@@ -28,8 +29,8 @@ import TaskDTab from '../components/TaskDTab.jsx';
   <div class="min-h-screen flex flex-col relative z-10">
     <!-- Glassmorphism Header -->
     <header class="bg-[#0a0a0f]/60 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50 transition-all duration-300">
-      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-4 group cursor-pointer">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative">
+        <div class="flex items-center gap-4 group cursor-pointer z-10">
           <div class="w-12 h-12 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] group-hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] transition-all duration-500 transform group-hover:rotate-12">
             hi
           </div>
@@ -37,7 +38,26 @@ import TaskDTab from '../components/TaskDTab.jsx';
             Hongseo Jang
           </h1>
         </div>
-        <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+
+        <!-- Modern Tabs moved to Header (Centered) -->
+        <div class="bg-[#13131a]/80 backdrop-blur-md p-1 rounded-xl shadow-inner border border-white/5 hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+          <button id="tab-btn-a" class="tab-btn relative z-10 px-5 py-2 font-bold transition-all duration-300 text-sm text-white">
+            <span class="flex items-center justify-center gap-2">✨ Enhancement</span>
+          </button>
+          <button id="tab-btn-b" class="tab-btn relative z-10 px-5 py-2 font-bold transition-all duration-300 text-sm text-gray-400 hover:text-gray-200">
+            <span class="flex items-center justify-center gap-2">🪙 Detection</span>
+          </button>
+          <button id="tab-btn-c" class="tab-btn relative z-10 px-5 py-2 font-bold transition-all duration-300 text-sm text-gray-400 hover:text-gray-200">
+            <span class="flex items-center justify-center gap-2">🔗 Feature Matching</span>
+          </button>
+          <button id="tab-btn-d" class="tab-btn relative z-10 px-5 py-2 font-bold transition-all duration-300 text-sm text-gray-400 hover:text-gray-200">
+            <span class="flex items-center justify-center gap-2">🚗 Tracking</span>
+          </button>
+          <!-- Active Tab Indicator -->
+          <div id="tab-indicator" class="absolute top-1 left-0 h-[calc(100%-8px)] bg-gradient-to-r from-blue-600/80 to-purple-600/80 rounded-lg shadow-[0_0_10px_rgba(99,102,241,0.3)] transition-all duration-500 ease-out z-0 border border-white/10" style="width: 0; transform: translateX(0);"></div>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400 z-10">
           <a href="#" class="hover:text-white transition-colors">Documentation</a>
           <a href="#" class="hover:text-white transition-colors">API</a>
           <button class="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/5 transition-all">
@@ -57,27 +77,14 @@ import TaskDTab from '../components/TaskDTab.jsx';
           국립순천대학교 컴퓨터비전 
         </div>
         <h2 class="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
-          Next-Gen <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Computer Vision</span>
+          Next-Gen <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 bg-[length:200%_auto] animate-text-gradient">Computer Vision</span>
         </h2>
         <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
           Experience state-of-the-art image processing, object detection, and motion tracking directly in your browser. Powered by FastAPI and OpenCV.
         </p>
       </div>
 
-      <!-- Modern Tabs -->
-      <div class="bg-[#13131a]/80 backdrop-blur-md p-1.5 rounded-2xl shadow-2xl border border-white/5 mb-10 max-w-3xl mx-auto flex flex-wrap relative">
-        <button id="tab-btn-a" class="tab-btn flex-1 relative z-10 px-6 py-4 font-bold transition-all duration-300 text-sm md:text-base text-white">
-          <span class="flex items-center justify-center gap-2">✨ Enhancement</span>
-        </button>
-        <button id="tab-btn-b" class="tab-btn flex-1 relative z-10 px-6 py-4 font-bold transition-all duration-300 text-sm md:text-base text-gray-400 hover:text-gray-200">
-          <span class="flex items-center justify-center gap-2">🪙 Detection</span>
-        </button>
-        <button id="tab-btn-d" class="tab-btn flex-1 relative z-10 px-6 py-4 font-bold transition-all duration-300 text-sm md:text-base text-gray-400 hover:text-gray-200">
-          <span class="flex items-center justify-center gap-2">🚗 Tracking</span>
-        </button>
-        <!-- Active Tab Indicator -->
-        <div id="tab-indicator" class="absolute top-1.5 left-1.5 h-[calc(100%-12px)] bg-gradient-to-r from-blue-600/80 to-purple-600/80 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all duration-500 ease-out z-0 border border-white/10" style="width: calc(33.333% - 4px); transform: translateX(0);"></div>
-      </div>
+      <!-- Modern Tabs have been moved to the header -->
 
       <!-- Tab Contents -->
       <div class="relative max-w-5xl mx-auto w-full">
@@ -86,6 +93,9 @@ import TaskDTab from '../components/TaskDTab.jsx';
         </div>
         <div id="tab-content-b" class="tab-content hidden">
           <TaskBTab client:load />
+        </div>
+        <div id="tab-content-c" class="tab-content hidden">
+          <TaskCTab client:load />
         </div>
         <div id="tab-content-d" class="tab-content hidden">
           <TaskDTab client:load />
@@ -111,15 +121,23 @@ import TaskDTab from '../components/TaskDTab.jsx';
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const tabs = ['a', 'b', 'd'];
+      const tabs = ['a', 'b', 'c', 'd'];
       const indicator = document.getElementById('tab-indicator');
       
+      // Initialize indicator position
+      const firstBtn = document.getElementById('tab-btn-a');
+      if (indicator && firstBtn) {
+        indicator.style.width = `${firstBtn.offsetWidth}px`;
+        indicator.style.transform = `translateX(${firstBtn.offsetLeft}px)`;
+      }
+
       tabs.forEach((tab, index) => {
         const btn = document.getElementById(`tab-btn-${tab}`);
         btn?.addEventListener('click', () => {
-          // Move Indicator
-          if (indicator) {
-            indicator.style.transform = `translateX(calc(${index * 100}% + ${index * 6}px))`;
+          // Move Indicator dynamically based on button size and position
+          if (indicator && btn) {
+            indicator.style.width = `${btn.offsetWidth}px`;
+            indicator.style.transform = `translateX(${btn.offsetLeft}px)`;
           }
 
           tabs.forEach(t => {

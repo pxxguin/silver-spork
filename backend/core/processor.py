@@ -124,3 +124,49 @@ class MotionTracker(BaseVisionProcessor):
         cap.release()
         out.release()
         return True
+
+class FeatureMatcher(BaseVisionProcessor):
+    @staticmethod
+    def match_features(img1: np.ndarray, img2: np.ndarray, algo: str = 'SIFT', nfeatures: int = 0, lowe_ratio: float = 0.7, nOctaveLayers: int = 3, contrastThreshold: float = 0.04) -> Tuple[np.ndarray, int]:
+        if algo == 'SIFT':
+            detector = cv2.SIFT_create(nfeatures=nfeatures, nOctaveLayers=nOctaveLayers, contrastThreshold=contrastThreshold)
+        else: # ORB
+            detector = cv2.ORB_create(nfeatures=nfeatures if nfeatures > 0 else 500)
+            
+        kp1, des1 = detector.detectAndCompute(img1, None)
+        kp2, des2 = detector.detectAndCompute(img2, None)
+        
+        if des1 is None or des2 is None:
+            return np.hstack((img1, img2)), 0
+            
+        if algo == 'SIFT':
+            FLANN_INDEX_KDTREE = 1
+            index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+            search_params = dict(checks=50)
+            matcher = cv2.FlannBasedMatcher(index_params, search_params)
+            try:
+                matches = matcher.knnMatch(des1, des2, k=2)
+            except Exception:
+                return np.hstack((img1, img2)), 0
+        else:
+            matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+            try:
+                matches = matcher.knnMatch(des1, des2, k=2)
+            except Exception:
+                return np.hstack((img1, img2)), 0
+                
+        good_matches = []
+        if len(matches) > 0 and len(matches[0]) >= 2:
+            for m, n in matches:
+                if m.distance < lowe_ratio * n.distance:
+                    good_matches.append(m)
+        elif len(matches) > 0 and len(matches[0]) == 1:
+            good_matches = [m[0] for m in matches]
+            
+        draw_params = dict(matchColor=(0,255,0),
+                           singlePointColor=(255,0,0),
+                           flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+                           
+        result_img = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, None, **draw_params)
+        
+        return result_img, len(good_matches)
