@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 export default function TaskBTab() {
+  const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
+
   const [file, setFile] = useState(null);
   const [internalFiles, setInternalFiles] = useState([]);
   const [selectedInternalFile, setSelectedInternalFile] = useState('');
@@ -25,7 +27,7 @@ export default function TaskBTab() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/datasets/B')
+    fetch(`${API_URL}/api/datasets/B`)
       .then(res => res.json())
       .then(data => {
         if (data.files) setInternalFiles(data.files);
@@ -94,7 +96,7 @@ export default function TaskBTab() {
     formData.append('max_radius', maxRadius);
 
     try {
-      const response = await fetch('http://localhost:8000/api/detect', {
+      const response = await fetch(`${API_URL}/api/detect`, {
         method: 'POST',
         body: formData,
       });
@@ -202,7 +204,7 @@ export default function TaskBTab() {
                     onClick={() => handleInternalFileSelect(f)}
                     className={`cursor-pointer overflow-hidden rounded-xl aspect-square bg-gray-900 flex items-center justify-center border-2 transition-all group ${selectedInternalFile === f ? 'border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-[1.02]' : 'border-transparent hover:border-emerald-400/50 hover:scale-[1.02]'}`}
                   >
-                    <img src={`http://localhost:8000/api/datasets/file/B/${f}`} alt="Thumbnail" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" loading="lazy" />
+                    <img src={`${API_URL}/api/datasets/file/B/${f}`} alt="Thumbnail" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" loading="lazy" />
                   </div>
                 ))}
               </div>

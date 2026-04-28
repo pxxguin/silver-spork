@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import MatchListViewer from './MatchListViewer.jsx';
 
 export default function TaskCTab() {
+  const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
   const [internalFiles, setInternalFiles] = useState([]);
   const [showInternalGridTarget, setShowInternalGridTarget] = useState(false);
   const [showInternalGridQuery, setShowInternalGridQuery] = useState(false);
@@ -38,7 +39,7 @@ export default function TaskCTab() {
   const [toast, setToast] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/datasets/C')
+    fetch(`${API_URL}/api/datasets/C`)
       .then(res => res.json())
       .then(data => {
         if (data.files) setInternalFiles(data.files);
@@ -132,7 +133,7 @@ export default function TaskCTab() {
     formData.append('contrastThreshold', contrastThreshold);
 
     try {
-      const response = await fetch('http://localhost:8000/api/match', {
+      const response = await fetch(`${API_URL}/api/match`, {
         method: 'POST',
         body: formData,
       });
@@ -228,7 +229,7 @@ export default function TaskCTab() {
                   onClick={() => handleInternalFileSelect(f, type)}
                   className={`cursor-pointer overflow-hidden rounded-lg aspect-square bg-gray-900 flex items-center justify-center border transition-all group ${selectedInternal === f ? 'border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'border-transparent hover:border-indigo-400/50'}`}
                 >
-                  <img src={`http://localhost:8000/api/datasets/file/C/${f}`} alt="Thumbnail" className="w-full h-full object-cover opacity-80 group-hover:opacity-100" loading="lazy" />
+                  <img src={`${API_URL}/api/datasets/file/C/${f}`} alt="Thumbnail" className="w-full h-full object-cover opacity-80 group-hover:opacity-100" loading="lazy" />
                 </div>
               )) : (
                 <div className="col-span-full text-center py-4 text-xs text-gray-500">No images in static/datasets/C</div>

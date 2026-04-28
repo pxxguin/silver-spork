@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 export default function TaskDTab() {
+  const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
+
   // Canvas and Image references
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
@@ -34,7 +36,7 @@ export default function TaskDTab() {
 
   // 1. Fetch Default Internal Datasets
   useEffect(() => {
-    fetch('http://localhost:8000/api/datasets/D')
+    fetch(`${API_URL}/api/datasets/D`)
       .then(res => res.json())
       .then(data => {
         if (data.files) setInternalFiles(data.files);
@@ -51,7 +53,7 @@ export default function TaskDTab() {
       const formData = new FormData();
       formData.append('file', uploadedFile);
       
-      const response = await fetch('http://localhost:8000/api/get-first-frame', {
+      const response = await fetch(API_URL + '/api/get-first-frame', {
         method: 'POST',
         body: formData,
       });
@@ -81,7 +83,7 @@ export default function TaskDTab() {
     
     const img = new Image();
     img.crossOrigin = 'Anonymous';
-    img.src = `http://localhost:8000/api/datasets/thumbnail/D/${filename}`;
+    img.src = `${API_URL}/api/datasets/thumbnail/D/${filename}`;
     img.onload = () => {
       imgRef.current = img;
       setFrameLoaded(true);
@@ -234,7 +236,7 @@ export default function TaskDTab() {
       };
       formData.append('roi', JSON.stringify(trackingPayload));
 
-      const response = await fetch('http://localhost:8000/api/track-roi', {
+      const response = await fetch(`${API_URL}/api/track-roi`, {
         method: 'POST',
         body: formData,
       });
@@ -245,8 +247,8 @@ export default function TaskDTab() {
       }
 
       const data = await response.json();
-      setVideoUrl(`http://localhost:8000${data.video_url}`);
-      setOriginalVideoUrl(`http://localhost:8000${data.original_video_url}`);
+      setVideoUrl(`${API_URL}${data.video_url}`);
+      setOriginalVideoUrl(`${API_URL}${data.original_video_url}`);
       
       setTimeout(() => {
         window.scrollBy({ top: 800, behavior: 'smooth' });
@@ -316,7 +318,7 @@ export default function TaskDTab() {
             <div className="max-h-[300px] overflow-y-auto bg-black/40 p-4 rounded-xl border border-white/5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 custom-scrollbar mt-3">
               {internalFiles.length > 0 ? internalFiles.map((f, idx) => (
                 <div key={idx} onClick={() => handleInternalFileSelect(f)} className={`cursor-pointer overflow-hidden rounded-xl aspect-square bg-gray-900 flex items-center justify-center border-2 transition-all group ${selectedInternalFile === f ? 'border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'border-transparent hover:border-purple-400/50'}`}>
-                  <img src={`http://localhost:8000/api/datasets/thumbnail/D/${f}`} alt="Thumbnail" className="w-full h-full object-cover opacity-60 group-hover:opacity-100" loading="lazy" />
+                  <img src={`${API_URL}/api/datasets/thumbnail/D/${f}`} alt="Thumbnail" className="w-full h-full object-cover opacity-60 group-hover:opacity-100" loading="lazy" />
                 </div>
               )) : <div className="col-span-full py-4 text-center text-sm text-gray-500">No videos found in datasets/D</div>}
             </div>
