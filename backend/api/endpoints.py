@@ -101,6 +101,31 @@ def get_dataset_thumbnail(task: str, file_path: str):
         _, encoded_img = cv2.imencode('.jpg', frame)
         return Response(content=encoded_img.tobytes(), media_type="image/jpeg")
 
+import tempfile
+
+@router.post("/get-first-frame")
+async def get_first_frame_from_upload(file: UploadFile = File(...)):
+    validate_video(file)
+    contents = await file.read()
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".video") as tmp:
+        tmp.write(contents)
+        tmp_path = tmp.name
+        
+    try:
+        cap = cv2.VideoCapture(tmp_path)
+        ret, frame = cap.read()
+        cap.release()
+        
+        if not ret:
+            raise HTTPException(status_code=500, detail="비디오에서 프레임을 읽을 수 없습니다.")
+            
+        _, encoded_img = cv2.imencode('.jpg', frame)
+        return Response(content=encoded_img.tobytes(), media_type="image/jpeg")
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
 @router.post("/preprocess")
 async def preprocess_image(
     file: Optional[UploadFile] = File(None),
@@ -243,6 +268,69 @@ async def track_motion(
         
     download_url = f"/static/outputs/{out_filename}"
     original_url = f"/static/outputs/{orig_filename}"
+    return {
+        "video_url": download_url,
+        "original_video_url": original_url
+    }
+
+@router.post("/track-roi")
+async def track_roi(
+    file: Optional[UploadFile] = File(None),
+    internal_file: Optional[str] = Form(None),
+    roi: str = Form(...)
+):
+    import json
+    try:
+        tracking_payload = json.loads(roi)
+        if "roi" in tracking_payload and "params" in tracking_payload:
+            roi_dict = tracking_payload["roi"]
+            params_dict = tracking_payload["params"]
+        else:
+            roi_dict = tracking_payload
+            params_dict = {}
+    except Exception:
+        raise HTTPException(status_code=400, detail="유효하지 않은 ROI 포맷입니다.")
+        
+    validate_video(file)
+    
+    orig_filename = f"orig_{uuid.uuid4()}.mp4"
+    orig_filepath = os.path.join(OUTPUT_DIR, orig_filename)
+    
+    if file:
+        contents = await file.read()
+        if len(contents) > MAX_VIDEO_SIZE:
+            raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="파일 용량이 50MB를 초과합니다.")
+            
+        temp_filename = f"temp_{uuid.uuid4()}.mp4"
+        temp_filepath = os.path.join(OUTPUT_DIR, temp_filename)
+        
+        with open(temp_filepath, "wb") as f:
+            f.write(contents)
+            
+        MotionTracker.transcode_video(temp_filepath, orig_filepath)
+    elif internal_file:
+        files, base_path = get_dataset_files('D')
+        if internal_file not in files:
+            raise HTTPException(status_code=400, detail="유효하지 않은 내장 파일입니다.")
+        temp_filepath = os.path.join(base_path, internal_file)
+        MotionTracker.transcode_video(temp_filepath, orig_filepath)
+    else:
+        raise HTTPException(status_code=400, detail="비디오 파일이 제공되지 않았습니다.")
+        
+    out_filename = f"tracked_roi_{uuid.uuid4()}.mp4"
+    out_filepath = os.path.join(OUTPUT_DIR, out_filename)
+    
+    success = MotionTracker.track_object_roi(temp_filepath, out_filepath, roi_dict, params_dict)
+    
+    if file and os.path.exists(temp_filepath):
+        os.remove(temp_filepath)
+        
+    if not success:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="비디오 처리 중 오류가 발생했습니다.")
+        
+    download_url = f"/static/outputs/{out_filename}"
+    original_url = f"/static/outputs/{orig_filename}"
+    
     return {
         "video_url": download_url,
         "original_video_url": original_url

@@ -103,6 +103,65 @@ class MotionTracker(BaseVisionProcessor):
         return True
 
     @staticmethod
+    def track_object_roi(input_path: str, output_path: str, roi: dict, params: dict = None) -> bool:
+        cap = cv2.VideoCapture(input_path)
+        if not cap.isOpened():
+            return False
+            
+        ret, frame = cap.read()
+        if not ret:
+            cap.release()
+            return False
+            
+        tracker = None
+        try:
+            tracker = cv2.TrackerCSRT_create()
+        except AttributeError:
+            try:
+                tracker = cv2.TrackerKCF_create()
+            except AttributeError:
+                tracker = cv2.TrackerMIL_create()
+                
+        bbox = (int(roi['x']), int(roi['y']), int(roi['width']), int(roi['height']))
+        tracker.init(frame, bbox)
+        
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        
+        fourcc = cv2.VideoWriter_fourcc(*'avc1')
+        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+        
+        p1 = (int(bbox[0]), int(bbox[1]))
+        p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
+        cv2.rectangle(frame, p1, p2, (255, 0, 255), 2, 1)
+        out.write(frame)
+        
+        frame_count = 0
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+                
+            success, bbox = tracker.update(frame)
+            if success:
+                p1 = (int(bbox[0]), int(bbox[1]))
+                p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
+                cv2.rectangle(frame, p1, p2, (255, 0, 255), 2, 1)
+                cv2.putText(frame, "Tracking", (p1[0], p1[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 255), 2)
+            else:
+                cv2.putText(frame, "Lost", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
+                
+            out.write(frame)
+            frame_count += 1
+            if frame_count > 450:
+                break
+                
+        cap.release()
+        out.release()
+        return True
+
+    @staticmethod
     def transcode_video(input_path: str, output_path: str) -> bool:
         cap = cv2.VideoCapture(input_path)
         if not cap.isOpened():
